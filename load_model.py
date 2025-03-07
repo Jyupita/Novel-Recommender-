@@ -7,11 +7,11 @@ import logging
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackContext
 
-# Enable logging
+# Enabling  logging
 logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load data
+# Load the data we need
 books = pd.read_csv("C:/Users/kl/Desktop/Novel Recommender/books_cleaned.csv")
 ratings = pd.read_csv("C:/Users/kl/Desktop/Novel Recommender/ratings.csv")
 
@@ -22,7 +22,7 @@ tfidf_matrix = tfidf.fit_transform(books["title"])
 # Compute cosine similarity matrix
 cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
 
-# Recommendation function
+# The recommendation function
 def get_recommendations(title):
     if title not in books["title"].values:
         return ["Sorry, book not found in the database. Try another title."]
@@ -35,9 +35,9 @@ def get_recommendations(title):
     
     return books["title"].iloc[book_indices].tolist()
 
-# Function to handle recommendations in the Telegram bot
+# This is the function to handle recommendations in the Telegram bot
 async def recommend(update: Update, context: CallbackContext):
-    user_input = update.message.text.strip()  # Get the book title from the user
+    user_input = update.message.text.strip()  #This will get the book title from the user (the user to input the book title)
     recommended_books = get_recommendations(user_input)
 
     response = f"📚 *Recommended books based on '{user_input}':*\n\n"
@@ -45,17 +45,17 @@ async def recommend(update: Update, context: CallbackContext):
 
     await update.message.reply_text(response, parse_mode="Markdown")
 
-# Start command
+# Start command function for the bot
 async def start(update: Update, context: CallbackContext):
     await update.message.reply_text("📖 Welcome to the Novel Recommendation Bot!\n\nSend me a book title, and I'll recommend similar books for you.")
 
-# Main function to run the bot
+#  This is the main function to run the bot using the token
 def main():
-    TOKEN = "8156559476:AAGo75-zEUERpaYSLzxNXxeaxeOCmoDrc5k"  # Replace with your actual bot token
+    TOKEN = "8156559476:AAGo75-zEUERpaYSLzxNXxeaxeOCmoDrc5k"
 
     app = Application.builder().token(TOKEN).build()
 
-    # Add handlers
+    # Adding handlers
     app.add_handler(CommandHandler("start", start))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, recommend))
 
